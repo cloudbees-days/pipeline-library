@@ -1,5 +1,5 @@
 // vars/kubeDeploy.groovy
-def call(imageName, imageTag, githubCredentialId, repoOwner) {
+def call(imageName, imageTag, githubCredentialId, repoOwner, hostnameURL) {
     def label = "kubectl"
     def podYaml = libraryResource 'podtemplates/kubeDeploy.yml'
     def deployYaml = libraryResource 'k8s/basicDeploy.yml'
@@ -27,6 +27,7 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
         writeFile file: "deploy.yml", text: deployYaml
         sh("sed -i.bak 's#REPLACE_IMAGE_TAG#gcr.io/core-workshop/helloworld-nodejs:${repoName}-${BUILD_NUMBER}#' deploy.yml")
         sh("sed -i.bak 's#REPLACE_SERVICE_NAME#${repoName}#' deploy.yml")
+        sh("sed -i.bak 's#REPLACE_HOSTNAMEURL#${hostnameURL}#' deploy.yml")  
         withCredentials([usernamePassword(credentialsId: githubCredentialId, usernameVariable: 'USERNAME', passwordVariable: 'ACCESS_TOKEN')]) {
           sh """
             git init
@@ -40,7 +41,7 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
         }
         container("kubectl") {
           sh "kubectl apply -f deploy.yml"
-          sh "echo 'deployed to http://staging.cb-sa.io/${repoName}/'"
+            sh "echo 'deployed to ${hostnameURL}/${repoName}/'"
         }
       }
     }
