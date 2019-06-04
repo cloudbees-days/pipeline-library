@@ -10,6 +10,9 @@ def call(imageName, imageTag, githubCredentialId, repoOwner, hostnameURL) {
       node(label) {
         //create environment repo for prod if it doesn't already exist
         echo githubCredentialId
+        sh("which curl")
+        sh("which jq")
+
         withCredentials([usernamePassword(credentialsId: githubCredentialId, usernameVariable: 'USERNAME', passwordVariable: 'ACCESS_TOKEN')]) {
           echo repoOwner
           echo envStagingRepo
