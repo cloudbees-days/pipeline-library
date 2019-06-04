@@ -58,4 +58,4 @@ spec:
         backend:
           serviceName: REPLACE_SERVICE_NAME
           servicePort: 80
-    host: staging.cb-sa.io
+    host: HOSTNAME_URL
