@@ -35,7 +35,8 @@ def call(imageName, imageTag, githubCredentialId, repoOwner, hostnameURL) {
             git config user.name "${USERNAME}"
             git add deploy.yml
             git commit -a -m 'updating ${envStagingRepo} deployment for ${repoName}'
-            git remote add origin https://${USERNAME}:${ACCESS_TOKEN}@github.com/bee-cd/${envStagingRepo}.git
+            git remote add origin https://${USERNAME}:${ACCESS_TOKEN}@github.com/${repoOwner}/${envStagingRepo}.git
+            git pull origin master
             git push -u origin master
           """
         }
