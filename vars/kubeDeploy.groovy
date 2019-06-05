@@ -19,7 +19,7 @@ def call(imageName, imageTag, githubCredentialId, repoOwner, hostnameURL) {
           echo repoNotExists
           if(repoNotExists) {
           sh(script: """
-              curl -H "Authorization: token $ACCESS_TOKEN" --data '{"name":"${envStagingRepo}"}' https://api.github.com/orgs/${repoOwner}/repos
+             curl -H "Authorization: token $ACCESS_TOKEN" --data '{"name":"${envStagingRepo}"}' https://api.github.com/orgs/${repoOwner}/repos
             """)
           }
           //curl -H "Authorization: token ACCESS_TOKEN" --data '{"name":""}' https://api.github.com/orgs/ORGANISATION_NAME/repos
@@ -42,7 +42,7 @@ def call(imageName, imageTag, githubCredentialId, repoOwner, hostnameURL) {
         }
         container("kubectl") {
           sh "kubectl apply -f deploy.yml"
-            sh "echo 'deployed to ${hostnameURL}/${repoName}/'"
+          sh "echo 'deployed to ${hostnameURL}/${repoName}/'"
         }
       }
     }
