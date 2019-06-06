@@ -3,7 +3,7 @@ metadata:
   name: nodejs-app
 spec:
   securityContext:
-    runAsUser: 10000
+    runAsUser: 1000
   containers:
   - name: nodejs
     image: node:10.10.0-alpine
