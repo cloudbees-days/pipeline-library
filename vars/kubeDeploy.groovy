@@ -5,6 +5,7 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
     def deployYaml = libraryResource 'k8s/basicDeploy.yml'
     def repoName = env.IMAGE_REPO.toLowerCase()
     def envStagingRepo = "environment_staging"
+    def pullMaster = true
     
     podTemplate(name: 'kubectl', label: label, yaml: podYaml) {
       node(label) {
@@ -18,9 +19,10 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
             ''', returnStdout: true)
           echo repoNotExists
           if(repoNotExists) {
-          sh(script: """
-              curl -H "Authorization: token $ACCESS_TOKEN" --data '{"name":"${envStagingRepo}"}' https://api.github.com/orgs/${repoOwner}/repos
-            """)
+            sh(script: """
+                curl -H "Authorization: token $ACCESS_TOKEN" --data '{"name":"${envStagingRepo}"}' https://api.github.com/orgs/${repoOwner}/repos
+              """)
+             pullMaster = false 
           }
           //curl -H "Authorization: token ACCESS_TOKEN" --data '{"name":""}' https://api.github.com/orgs/ORGANISATION_NAME/repos
         }
@@ -32,10 +34,15 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
             git init
             git config user.email "deployBot@cb-sa.io"
             git config user.name "${USERNAME}"
-            git add deploy.yml
-            git commit -a -m 'updating ${envStagingRepo} deployment for ${repoName}'
             git remote add origin https://${USERNAME}:${ACCESS_TOKEN}@github.com/${repoOwner}/${envStagingRepo}.git
-            git pull origin master
+          """
+          if(pullMaster) {
+            sh 'git pull origin master'
+          } else {
+            sh 'git add deploy.yml'
+          }
+          sh """
+            git commit -a -m 'updating ${envStagingRepo} deployment for ${repoName}'
             git push -u origin master
           """
         }
