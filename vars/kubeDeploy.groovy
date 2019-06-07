@@ -42,8 +42,9 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
          //   sh 'git add deploy.yml'
          // }
           sh """
+            git stash
             git pull origin master
-	    git add deploy.yml
+	    git pop
             git commit -a -m 'updating ${envStagingRepo} deployment for ${repoName}'
             git push -u origin master
           """
