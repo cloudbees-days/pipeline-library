@@ -14,9 +14,9 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
         withCredentials([usernamePassword(credentialsId: githubCredentialId, usernameVariable: 'USERNAME', passwordVariable: 'ACCESS_TOKEN')]) {
           echo repoOwner
           echo envStagingRepo
-          def repoNotExists = sh(script: '''
-              curl -H "Authorization: token $ACCESS_TOKEN" https://api.github.com/repos/$repoOwner/$envStagingRepo | jq 'contains({message: "Not Found"})'
-            ''', returnStdout: true)
+          def repoNotExists = sh(script: """
+               echo ${envStagingRepo}; echo ${repoOwner}; curl -H "Authorization: token $ACCESS_TOKEN" https://api.github.com/repos/${repoOwner}/${envStagingRepo} | jq 'contains({message: "Not Found"})'
+            """, returnStdout: true)
           echo repoNotExists
           if(repoNotExists) {
             sh(script: """
@@ -36,12 +36,15 @@ def call(imageName, imageTag, githubCredentialId, repoOwner) {
             git config user.name "${USERNAME}"
             git remote add origin https://${USERNAME}:${ACCESS_TOKEN}@github.com/${repoOwner}/${envStagingRepo}.git
           """
-          if(pullMaster) {
-            sh 'git pull origin master'
-          } else {
-            sh 'git add deploy.yml'
-          }
+         // if(pullMaster) {
+         //   sh 'git pull origin master'
+         // } else {
+         //   sh 'git add deploy.yml'
+         // }
           sh """
+            git stash
+            git pull origin master
+	    git pop
             git commit -a -m 'updating ${envStagingRepo} deployment for ${repoName}'
             git push -u origin master
           """
